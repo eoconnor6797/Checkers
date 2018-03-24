@@ -1,0 +1,21 @@
+<h1>Checkers</h1>
+
+<div id="game">
+  <div class="row">
+    <div class="col">
+      <h1 id="index-page">Join a Game</h1>
+      <div class="form-group">
+        <label for="channel">Game Name:</label>
+        <input type="text" class="form-control" id="channel">
+        <button type="submit" class="btn btn-primary" onclick="submit()"> Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+  <script> function submit() {
+    var channel = document.getElementById("channel").value;
+    window.location.assign(window.location.href + "game/" + channel);
+  }
+  </script>
+
+
