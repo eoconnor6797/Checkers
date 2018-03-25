@@ -11,7 +11,6 @@ defmodule CheckersWeb.PageController do
   end
 
   def join(conn, %{"join_data" => join}) do
-    IO.inspect join;
     conn
     |> put_session(:user, join["user"])
     |> redirect(to: "/game/" <> join["game"])
