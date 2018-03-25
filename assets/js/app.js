@@ -24,8 +24,8 @@ import run_demo from "./demo";
 
 function init() {
   let root = document.getElementById('root');
+  let channel = socket.channel("games:" + window.gameName, {user: window.user});
   if (root) {
-    let channel = socket.channel("games:" + window.gameName, {});
     run_demo(root, channel);
   }
   if (document.getElementById('index_page')) {

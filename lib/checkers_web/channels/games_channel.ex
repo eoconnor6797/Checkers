@@ -7,14 +7,23 @@ defmodule CheckersWeb.GamesChannel do
   def join("games:" <> name, payload, socket) do
     if authorized?(payload) do
       game = Checkers.Agent.get(name) || Game.new()
+      user = Map.get(payload, "user")
+      game = Game.join(game, user)
+      IO.inspect(user)
       IO.inspect(game)
       Checkers.Agent.put(name, game)
       socket = socket
-      |> assign(:name, name)
+        |> assign(:name, name)
+      send(self, :after_join)
       {:ok, %{"join" => name}, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
+  end
+  def handle_info(:after_join, socket) do
+    game = Checkers.Agent.get(socket.assigns[:name])
+    broadcast socket, "update", game
+    {:noreply, socket}
   end
 
   # Channels can be used in a request/response fashion
@@ -22,11 +31,18 @@ defmodule CheckersWeb.GamesChannel do
   def handle_in("ping", payload, socket) do
     name = socket.assigns[:name]
     game = Checkers.Agent.get(name)
+    turn = Map.get(game, "turn")
+    player_turn = Map.get(game, turn)
+    user = Map.get(payload, "user")
     pos = Map.get(payload, "pos")
-    game = Map.put(game, "pos1", pos)
-    game = Map.put(game, "selected", true)
-    Agent.put(name, game)
-    broadcast_from socket, "update", game
+    board = Map.get(game, "board")
+    if (Game.valid_turn(board, user, turn, player_turn, pos)) do
+      pos = Map.get(payload, "pos")
+      game = Map.put(game, "pos1", pos)
+      game = Map.put(game, "selected", true)
+      Agent.put(name, game)
+      broadcast_from socket, "update", game
+    end
     {:reply, {:ok, game}, socket}
   end
 
@@ -35,11 +51,17 @@ defmodule CheckersWeb.GamesChannel do
     game = Checkers.Agent.get(name)
     pos1 = Map.get(payload, "pos1")
     pos2 = Map.get(payload, "pos2")
-    payload = Game.move(Map.get(game, "board"), pos1, pos2)
-    Agent.put(name, payload)
-    IO.inspect(payload)
-    broadcast_from socket, "update", payload
-    {:reply, {:ok, payload}, socket}
+    turn = Map.get(game, "turn")
+    player_turn = Map.get(game, turn)
+    user = Map.get(payload, "user")
+    board = Map.get(game, "board")
+    if (Game.valid_turn(board, user, turn, player_turn, pos1)) do
+      game = Game.move(game, pos1, pos2)
+      Agent.put(name, game)
+      IO.inspect(payload)
+      broadcast_from socket, "update", game
+    end
+    {:reply, {:ok, game}, socket}
   end
 
   # It is also common to receive messages from the client and

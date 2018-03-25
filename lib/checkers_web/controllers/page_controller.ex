@@ -6,6 +6,14 @@ defmodule CheckersWeb.PageController do
   end
 
   def game(conn, params) do
-    render conn, "game.html", game: params["game"]
+    user = get_session(conn, :user)
+    render conn, "game.html", game: params["game"], user: user
+  end
+
+  def join(conn, %{"join_data" => join}) do
+    IO.inspect join;
+    conn
+    |> put_session(:user, join["user"])
+    |> redirect(to: "/game/" <> join["game"])
   end
 end
