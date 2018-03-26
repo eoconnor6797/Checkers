@@ -9,8 +9,6 @@ defmodule CheckersWeb.GamesChannel do
       game = Checkers.Agent.get(name) || Game.new()
       user = Map.get(payload, "user")
       game = Game.join(game, user)
-      IO.inspect(user)
-      IO.inspect(game)
       Checkers.Agent.put(name, game)
       socket = socket
         |> assign(:name, name)
@@ -20,6 +18,7 @@ defmodule CheckersWeb.GamesChannel do
       {:error, %{reason: "unauthorized"}}
     end
   end
+
   def handle_info(:after_join, socket) do
     game = Checkers.Agent.get(socket.assigns[:name])
     broadcast socket, "update", game
@@ -58,7 +57,6 @@ defmodule CheckersWeb.GamesChannel do
     if (Game.valid_turn(board, user, turn, player_turn, pos1)) do
       game = Game.move(game, pos1, pos2)
       Agent.put(name, game)
-      IO.inspect(payload)
       broadcast_from socket, "update", game
     end
     {:reply, {:ok, game}, socket}
@@ -66,10 +64,6 @@ defmodule CheckersWeb.GamesChannel do
 
   # It is also common to receive messages from the client and
   # broadcast to everyone in the current topic (games:lobby).
-  def handle_in("shout", payload, socket) do
-    broadcast socket, "shout", payload
-    {:noreply, socket}
-  end
 
   def handle_in("withdraw", payload, socket) do
     name = socket.assigns[:name]

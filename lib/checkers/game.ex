@@ -17,9 +17,6 @@ defmodule Checkers.Game do
     row = Enum.at(game, Map.get(pos,"x"))
     new_row = List.replace_at(row, Map.get(pos, "y"), new_piece)
     game = List.replace_at(game, Map.get(pos, "x"), new_row)
-    IO.puts("\n")
-    IO.inspect(pos)
-    IO.puts("\n")
     game
   end 
 
@@ -92,11 +89,9 @@ defmodule Checkers.Game do
     case color do
       "black" ->
         piece_count = Map.get(game, "white_count")
-        IO.inspect(piece_count - 1)
         Map.put(game, "white_count", (piece_count - 1))
       "Cornsilk" ->
         piece_count = Map.get(game, "black_count")
-        IO.inspect(piece_count - 1)
         Map.put(game, "black_count", (piece_count - 1))
     end
   end
@@ -288,10 +283,6 @@ defmodule Checkers.Game do
     y = Map.get(pos, "y")
     piece = Enum.at(Enum.at(board, x), y)
     color = Map.get(piece, "color")
-    IO.inspect user
-    IO.inspect player_turn
-    IO.inspect turn
-    IO.inspect color
     user == player_turn and turn == color
   end
 

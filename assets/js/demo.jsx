@@ -32,7 +32,6 @@ class Demo extends React.Component {
         this.user = user;
         this.channel = props.channel;
         this.state = { board : Init(), selected : false, pos1 : {x : -1, y : -1}, black : "", Cornsilk : "", turn: "", white_count : 12, black_count : 12};
-        console.log(this.state.board)
         this.channel.join()
             .receive("ok", msg => { console.log(msg)})
             .receive("error", resp => { console.log("Unable to join channel", resp) });
@@ -42,22 +41,19 @@ class Demo extends React.Component {
     handleClick(ii, jj) {
         let color = this.state.turn;
         let player = this.state[color];
-        console.log(player, this.user)
         if (player =! user) {
-            console.log("this was true")
             return
         }
         if (this.state.selected) {
-            this.channel.push("push", {board : this.state.board, pos1 : this.state.pos1, pos2: {x : ii, y : jj}, user : this.user })
+            this.channel.push("push", {pos1 : this.state.pos1, pos2: {x : ii, y : jj}, user : this.user })
                 .receive("ok", this.move_piece.bind(this));
         } else {
-            this.channel.push("ping", {user : this.user, board : this.state.board, pos: {x : ii, y : jj}})
+            this.channel.push("ping", {user : this.user, pos: {x : ii, y : jj}})
                 .receive("ok", this.move_piece.bind(this));
         }   
     }
 
     move_piece(msg) {
-        console.log(msg)
         this.setState(msg)
     }
 
