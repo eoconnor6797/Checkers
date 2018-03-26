@@ -71,6 +71,24 @@ defmodule CheckersWeb.GamesChannel do
     {:noreply, socket}
   end
 
+  def handle_in("withdraw", payload, socket) do
+    name = socket.assigns[:name]
+    game = Checkers.Agent.get(name)
+    game = Game.withdraw(game, Map.get(payload, "user"))
+    Agent.put(name, game)
+    broadcast socket, "update", game
+    {:reply, {:ok, game}, socket}
+  end
+
+  def handle_in("reset", _, socket) do
+    game = Checkers.Agent.get(socket.assigns[:name])
+    game = Game.play_again(game)
+    Checkers.Agent.put(socket.assigns[:name], game)
+    socket = assign(socket, :game, game)
+    broadcast socket, "update", game
+    {:reply, {:ok, game}, socket}
+  end
+
   # Add authorization logic here as required.
   defp authorized?(_payload) do
     true
