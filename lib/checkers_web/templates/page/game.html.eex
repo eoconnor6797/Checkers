@@ -7,6 +7,7 @@
     </div>
   </div>
 </div>
+    <%# Based on some stuff I found in Nat Tuck's draw game %>
 <script>
   window.gameName = "<%= @game %>";
   window.user = "<%= @user %>";
